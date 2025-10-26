@@ -2,7 +2,7 @@ import requests
 from utils import extract_skills
 API_URL = "https://www.themuse.com/api/public/jobs"
 
-def fetch_themuse_serial(pages=3):
+def fetch_themuse(pages=3):
     jobs = []
     for page in range(1, pages+1):
         resp = requests.get(API_URL, params={"page": page}, timeout=15)

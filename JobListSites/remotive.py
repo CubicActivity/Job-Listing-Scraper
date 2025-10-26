@@ -2,7 +2,7 @@ import requests
 from utils import extract_skills
 API_URL = "https://remotive.com/api/remote-jobs"
 
-def fetch_remotive_serial():
+def fetch_remotive():
     resp = requests.get(API_URL, timeout=15)
     resp.raise_for_status()
     jobs = []

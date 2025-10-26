@@ -2,7 +2,7 @@ import requests
 from utils import extract_skills
 API_URL = "https://remoteok.com/api"
 
-def fetch_remoteok_serial():
+def fetch_remoteok():
     resp = requests.get(API_URL, headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
     resp.raise_for_status()
     data = resp.json()

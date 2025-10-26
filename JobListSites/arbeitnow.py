@@ -2,7 +2,7 @@ import requests
 from utils import extract_skills
 API_URL = "https://www.arbeitnow.com/api/job-board-api"
 
-def fetch_arbeitnow_serial():
+def fetch_arbeitnow():
     resp = requests.get(API_URL, timeout=15)
     resp.raise_for_status()
     jobs = []
