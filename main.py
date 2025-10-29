@@ -1,10 +1,10 @@
 import time
 from utils import *
 
-from JobListSites.remotive import fetch_remotive
-from JobListSites.themuse import fetch_themuse
-from JobListSites.arbeitnow import fetch_arbeitnow
-from JobListSites.remoteok import fetch_remoteok
+from SiteConfigs.remotive import fetch_remotive
+from SiteConfigs.themuse import fetch_themuse
+from SiteConfigs.arbeitnow import fetch_arbeitnow
+from SiteConfigs.remoteok import fetch_remoteok
 
 if __name__ == "__main__":
     fetchers = [
