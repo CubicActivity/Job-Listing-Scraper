@@ -1,2 +1,2 @@
 # JobListScraper
-Python web scraper for concurrent collecting of job data from multiple portals
+Python based web scraper for concurrent scraping of jobs data from multiple web listing portals
