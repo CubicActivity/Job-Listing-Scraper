@@ -19,7 +19,7 @@ if __name__ == "__main__":
     for f in tqdm(fetchers, desc="Serial fetching"):
         serial_jobs.extend(f())
     serial_time = time.time() - t0
-    print(f"Serial collected {len(serial_jobs)} jobs in {serial_time:.2f}s")
+    print(f"Single thread collected {len(serial_jobs)} jobs in {serial_time:.2f}s")
 
     # 4 threads benchmark 
     t1 = time.time()
