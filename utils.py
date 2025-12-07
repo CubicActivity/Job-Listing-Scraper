@@ -41,9 +41,9 @@ def collect_jobs_parallel(fetchers, processes: int = 4):
 def run_fetcher(fetcher):
     return fetcher()
 
-def extract_skills(text: str) -> str:
-    found = [skill for skill in COMMON_SKILLS if skill.lower() in text.lower()]
-    return ", ".join(found)
+# def extract_skills(text: str) -> str:
+#     found = [skill for skill in COMMON_SKILLS if skill.lower() in text.lower()]
+#     return ", ".join(found)
 
 def save_jobs(jobs, filename="jobs.csv"):
     Path("CSV").mkdir(exist_ok=True)

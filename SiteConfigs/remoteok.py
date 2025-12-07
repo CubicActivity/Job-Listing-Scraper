@@ -1,5 +1,5 @@
 import requests
-from utils import extract_skills
+# from utils import extract_skills
 API_URL = "https://remoteok.com/api"
 
 def fetch_remoteok():
@@ -21,6 +21,6 @@ def fetch_remoteok():
             "location": job.get("location", ""),
             "url": "https://remoteok.com" + job.get("url", ""),
             "publication_date": job.get("date", ""),
-            "skills": extract_skills(job.get("position", "") + " " + desc),
+            # "skills": extract_skills(job.get("position", "") + " " + desc),
         })
     return jobs

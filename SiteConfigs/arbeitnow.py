@@ -1,5 +1,5 @@
 import requests
-from utils import extract_skills
+# from utils import extract_skills
 API_URL = "https://www.arbeitnow.com/api/job-board-api"
 
 def fetch_arbeitnow():
@@ -18,6 +18,6 @@ def fetch_arbeitnow():
             "location": job.get("location", ""),
             "url": job.get("url", ""),
             "publication_date": job.get("created_at", ""),
-            "skills": extract_skills(desc),
+            # "skills": extract_skills(desc),
         })
     return jobs

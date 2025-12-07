@@ -1,5 +1,5 @@
 import requests
-from utils import extract_skills
+# from utils import extract_skills
 API_URL = "https://remotive.com/api/remote-jobs"
 
 def fetch_remotive():
@@ -18,6 +18,6 @@ def fetch_remotive():
             "location": job.get("candidate_required_location", ""),
             "url": job.get("url", ""),
             "publication_date": job.get("publication_date", ""),
-            "skills": extract_skills(job.get("title", "") + " " + desc),
+            # "skills": extract_skills(job.get("title", "") + " " + desc),
         })
     return jobs
