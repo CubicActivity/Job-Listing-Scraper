@@ -1,5 +1,5 @@
 import requests
-# from utils import extract_skills
+from utils import extract_skills
 API_URL = "https://www.themuse.com/api/public/jobs"
 
 def fetch_themuse(pages=1):
@@ -23,6 +23,6 @@ def fetch_themuse(pages=1):
                 "location": location_name,
                 "url": job.get("refs", {}).get("landing_page", ""),
                 "publication_date": job.get("publication_date", ""),
-                # "skills": extract_skills(job.get("name", "") + " " + contents),
+                "skills": extract_skills(job.get("name", "") + " " + contents),
             })
     return jobs
