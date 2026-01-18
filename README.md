@@ -1,2 +1,2 @@
 # Portal-Scraper
-Python based web scraper for concurrent scraping of job data from multiple web listing portals
+Python based web scraper for concurrent data fetching from web listing portals
