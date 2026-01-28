@@ -1,2 +1,2 @@
 # Job-List-Scraper
-Python based web scraper for parallelized data fetching from web listing portals
+Python based web scraper for multiprocessed data fetching from web hiring portals
