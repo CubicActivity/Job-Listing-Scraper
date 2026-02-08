@@ -21,3 +21,5 @@ def fetch_remotive():
             "skills": extract_skills(job.get("title", "") + " " + desc),
         })
     return jobs
+
+

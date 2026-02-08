@@ -38,3 +38,28 @@ def export_jobs(jobs, filename="jobs.csv"):
     df.drop_duplicates(subset=["title", "company", "url"], inplace=True)
     df.to_csv(Path("Results") / filename, index=False)
     print(f"\nExported {len(df)} jobs to Results/{filename}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

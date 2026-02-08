@@ -26,3 +26,7 @@ def fetch_themuse(pages=1):
                 "skills": extract_skills(job.get("name", "") + " " + contents),
             })
     return jobs
+
+
+
+
