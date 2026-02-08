@@ -35,5 +35,6 @@ if __name__ == "__main__":
     print(f"Parallel (8 process) collected {len(parallel_jobs2)} jobs in {parallel_time2:.2f}s")
 
     export_jobs(parallel_jobs, str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S").replace(":", "-")))
-    print(f"Best speedup factor in parallel: {serial_time / min(parallel_time2,parallel_time):.2f}x")
+    print(f"Speedup factor in parallel (4 process): {serial_time / parallel_time:.2f}x")
+    print(f"Speedup factor in parallel (8 process): {serial_time / parallel_time2:.2f}x")
 
