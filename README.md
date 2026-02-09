@@ -1,2 +1,2 @@
 # PortalScrape 
-Python based web scraper for multiprocessed data fetching from job portals
+Multiprocessing based Python scraper - fetch data efficiently from multiple job portals
