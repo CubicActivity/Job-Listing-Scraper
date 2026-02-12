@@ -1,4 +1,4 @@
-from multiprocessing import Pool
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import pandas as pd
 from tqdm import tqdm
@@ -15,9 +15,9 @@ FIELDS = [
     "location", "url", "publication_date", "skills",
 ]
 
-def fetch_jobs(fetchers, processes: int = 4):
-    with Pool(processes=processes) as pool:
-        results = list(tqdm(pool.imap(run_fetcher, fetchers), total=len(fetchers), desc="Parallel fetching"))
+def fetch_jobs(fetchers, max_workers: int = 4):
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        results = list(executor.map(run_fetcher, fetchers))
     jobs = [job for sublist in results for job in sublist]
     return jobs
 
@@ -37,7 +37,7 @@ def export_jobs(jobs, filename="jobs.csv"):
     df = df[FIELDS]
     df.drop_duplicates(subset=["title", "company", "url"], inplace=True)
     df.to_csv(Path("Results") / filename, index=False)
-    print(f"\nExported {len(df)} jobs to Results/{filename}")
+    print(f"\nSaved {len(df)} entries at Results/{filename}")
 
 
 
