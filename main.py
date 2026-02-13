@@ -38,4 +38,4 @@ if __name__ == "__main__":
     parallel_time3 = time.time() - t4
     print(f"8 threads:  {len(parallel_jobs3)} jobs in {parallel_time3:.2f}s ({sequential_time / parallel_time3:.2f}x)")
 
-    export_jobs(parallel_jobs, str(datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S").replace(":", "-")))
+    export_jobs(parallel_jobs, str(datetime.datetime.now().strftime("Date-%Y-%m-%d-Time-%H-%M-%S").replace(":", "-")) + ".csv")
