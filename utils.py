@@ -1,7 +1,6 @@
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import pandas as pd
-from tqdm import tqdm
 
 COMMON_SKILLS = [
     "Python", "JavaScript", "Java", "C++", "C#", "Ruby", "Go",
@@ -15,14 +14,30 @@ FIELDS = [
     "location", "url", "publication_date", "skills",
 ]
 
-def fetch_jobs(fetchers, max_workers: int = 4):
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        results = list(executor.map(run_fetcher, fetchers))
+def generate_fetch_tasks(fetchers_with_pages):
+    """
+    Expand fetchers into individual page tasks.
+    Input: [(fetcher_func, pages), ...]
+    Output: [(fetcher_func, page_num), ...]
+    """
+    tasks = []
+    for fetcher, pages in fetchers_with_pages:
+        for page in range(1, pages + 1):
+            tasks.append((fetcher, page))
+    return tasks
+
+
+def fetch_jobs(tasks, threads: int = 4):
+    """
+    Execute fetch tasks in parallel.
+    tasks = [(fetcher_func, page), ...]
+    """
+    with ThreadPoolExecutor(threads) as executor:
+        futures = [executor.submit(f, page) for f, page in tasks]
+        results = [f.result() for f in futures]
+
     jobs = [job for sublist in results for job in sublist]
     return jobs
-
-def run_fetcher(fetcher):
-    return fetcher()
 
 def extract_skills(text: str) -> str:
     found = [skill for skill in COMMON_SKILLS if skill.lower() in text.lower()]
@@ -37,29 +52,4 @@ def export_jobs(jobs, filename="jobs.csv"):
     df = df[FIELDS]
     df.drop_duplicates(subset=["title", "company", "url"], inplace=True)
     df.to_csv(Path("Results") / filename, index=False)
-    print(f"\nSaved {len(df)} entries at Results/{filename}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print(f"\nSaved {len(df)} unique entries at Results/{filename}")
