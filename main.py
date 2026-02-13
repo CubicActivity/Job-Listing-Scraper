@@ -8,7 +8,7 @@ from Fetchers.findwork import fetch_findwork
 
 if __name__ == "__main__":
     fetchers= [
-        (fetch_arbeitnow, 3),
+        (fetch_arbeitnow, 2),
         (fetch_jobicy, 3),
         (fetch_findwork, 2),
         (fetch_remoteok, 1)

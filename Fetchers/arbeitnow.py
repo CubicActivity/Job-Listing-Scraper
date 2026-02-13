@@ -3,10 +3,8 @@ from utils import extract_skills
 
 API_URL = "https://www.arbeitnow.com/api/job-board-api"
 
-
 def fetch_arbeitnow(page=1):
     try:
-        # Use server-side pagination
         resp = requests.get(
             API_URL,
             params={"page": page},
@@ -14,10 +12,7 @@ def fetch_arbeitnow(page=1):
         )
         resp.raise_for_status()
         data = resp.json()
-
-        # API returns paginated results directly
         page_jobs = data.get("data", [])
-
         jobs = []
         for job in page_jobs:
             desc = job.get("description", "")
