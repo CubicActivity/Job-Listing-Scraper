@@ -1,5 +1,5 @@
 # PortalScrape
-Distributed Python web scraper for gathering & storing hiring data from [Findwork](https://findwork.dev) and [ArbeitNow](https://www.arbeitnow.com).
+A distributed Python web scraper for gathering & storing hiring data from [findwork.dev](https://findwork.dev) and [arbeitnow.com](https://www.arbeitnow.com).
 ---
 
 ## Prerequisites
