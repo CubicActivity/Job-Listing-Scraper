@@ -1,5 +1,5 @@
 # PortalScrape
-A distributed Python web scraper for gathering and storing hiring data from [findwork.dev](https://findwork.dev) and [arbeitnow.com](https://www.arbeitnow.com) using Redis.
+A Parallel Python web scraper for gathering and storing hiring data from [findwork.dev](https://findwork.dev) and [arbeitnow.com](https://www.arbeitnow.com) using Redis.
 ---
 
 ## Prerequisites
