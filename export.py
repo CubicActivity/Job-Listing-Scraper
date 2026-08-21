@@ -3,13 +3,10 @@ from datetime import datetime
 import json
 from pathlib import Path
 import redis
-
-
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
-
 def export_results():
-  print('Reading results from Redis...')
+  print('Getting results from Redis...')
   records = []
 
   while True:
@@ -21,8 +18,7 @@ def export_results():
     except json.JSONDecodeError:
       continue
 
-  print(f'Read {len(records)} records.')
-
+  print(f'Found {len(records)} records.')
   results_dir = Path(__file__).resolve().parent / 'Results'
   results_dir.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +29,11 @@ def export_results():
   fieldnames = ['title', 'company', 'source', 'skills', 'url']
 
   with open(output_path, mode='w', newline='', encoding='utf-8') as f:
-    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer = csv.DictWriter(
+        f,
+        fieldnames=fieldnames,
+        delimiter=';'
+    )
     writer.writeheader()
     for record in records:
       writer.writerow({
@@ -43,7 +43,6 @@ def export_results():
           'skills': record.get('skills', 'General'),
           'url': record.get('url', ''),
       })
-
   print(f'Exported {len(records)} records to {output_path}.')
 
 

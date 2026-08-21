@@ -8,9 +8,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 import redis
 
-
 r = redis.Redis(host="localhost", port=6379, db=0)
-
 
 HEADERS = {
     "User-Agent": (
@@ -19,7 +17,6 @@ HEADERS = {
         "Chrome/121.0.0.0 Safari/537.36"
     )
 }
-
 
 SKILL_KEYWORDS = {
     "UI/UX Design": [
@@ -165,10 +162,7 @@ SKILL_KEYWORDS = {
     ],
 }
 
-
-FINDWORK_LINK_RE = re.compile(
-    r"^/(jobs/|[a-zA-Z0-9]{5,8}/)"
-)
+FINDWORK_LINK_RE = re.compile(r"^/(jobs/|[a-zA-Z0-9]{5,8}/)")
 
 
 def clean_text(text):
@@ -176,16 +170,13 @@ def clean_text(text):
         return "N/A"
 
     cleaned = " ".join(text.split())
-
     cleaned = (
-        cleaned
-        .replace(";", " ")
+        cleaned.replace(";", " ")
         .replace(",", " ")
         .replace("&Amp", "&")
         .replace('"', "")
         .strip()
     )
-
     return cleaned if cleaned else "N/A"
 
 
@@ -210,35 +201,22 @@ async def process_task(session, task):
     page = task["page"]
     jobs = []
 
-    # ============================================================
     # FINDWORK
-    # ============================================================
-
     if source == "Findwork":
         url = f"https://findwork.dev/?remote=true&page={page}"
 
         try:
             await asyncio.sleep(random.uniform(0.05, 0.10))
-            async with session.get(
-                url,
-                headers=HEADERS
-            ) as response:
-
+            async with session.get(url, headers=HEADERS) as response:
                 if response.status != 200:
-                    print(
-                        f"Findwork HTTP {response.status} "
-                        f"- page {page}"
-                    )
+                    print(f"Findwork HTTP {response.status} - page {page}")
                     return jobs
 
                 html = await response.text()
 
             soup = BeautifulSoup(html, "lxml")
 
-            # ----------------------------------------------------
             # JSON-LD
-            # ----------------------------------------------------
-
             json_scripts = soup.find_all(
                 "script",
                 type="application/ld+json"
@@ -250,12 +228,7 @@ async def process_task(session, task):
                         continue
 
                     data = json.loads(script.string)
-
-                    postings = (
-                        data
-                        if isinstance(data, list)
-                        else [data]
-                    )
+                    postings = data if isinstance(data, list) else [data]
 
                     for item in postings:
                         if not (
@@ -266,19 +239,11 @@ async def process_task(session, task):
 
                         title_raw = item.get("title", "")
                         job_url = item.get("url", "")
-
-                        hiring_org = item.get(
-                            "hiringOrganization",
-                            {}
-                        )
-
+                        hiring_org = item.get("hiringOrganization", {})
                         company_raw = ""
 
                         if isinstance(hiring_org, dict):
-                            company_raw = hiring_org.get(
-                                "name",
-                                ""
-                            )
+                            company_raw = hiring_org.get("name", "")
                         elif isinstance(hiring_org, str):
                             company_raw = hiring_org
 
@@ -305,16 +270,10 @@ async def process_task(session, task):
                                 "skills": extract_skills(title),
                             })
 
-                except (
-                    json.JSONDecodeError,
-                    AttributeError,
-                ):
+                except (json.JSONDecodeError, AttributeError):
                     continue
 
-            # ----------------------------------------------------
             # HTML FALLBACK
-            # ----------------------------------------------------
-
             if not jobs:
                 job_rows = (
                     soup.select('div[id^="job-"]')
@@ -339,19 +298,12 @@ async def process_task(session, task):
                     if not (title_el and link_el):
                         continue
 
-                    raw_title = title_el.get_text(
-                        strip=True
-                    )
-
+                    raw_title = title_el.get_text(strip=True)
                     company = "N/A"
 
                     company_el = (
-                        row.select_one(
-                            "a[href*='/companies/']"
-                        )
-                        or row.select_one(
-                            "a[href*='/company/']"
-                        )
+                        row.select_one("a[href*='/companies/']")
+                        or row.select_one("a[href*='/company/']")
                         or row.select_one(".company-name")
                         or row.select_one("p.text-muted")
                         or row.select_one("p.text-secondary")
@@ -360,59 +312,27 @@ async def process_task(session, task):
                     )
 
                     if company_el:
-                        company = clean_text(
-                            company_el.get_text()
-                        )
+                        company = clean_text(company_el.get_text())
 
                     if company == "N/A":
                         if " at " in raw_title:
-                            parts = raw_title.rsplit(
-                                " at ",
-                                1
-                            )
-                            clean_title = clean_text(
-                                parts[0]
-                            )
-                            company = clean_text(
-                                parts[1]
-                            )
-
+                            parts = raw_title.rsplit(" at ", 1)
+                            clean_title = clean_text(parts[0])
+                            company = clean_text(parts[1])
                         elif " - " in raw_title:
-                            parts = raw_title.rsplit(
-                                " - ",
-                                1
-                            )
-                            clean_title = clean_text(
-                                parts[0]
-                            )
-                            company = clean_text(
-                                parts[1]
-                            )
-
+                            parts = raw_title.rsplit(" - ", 1)
+                            clean_title = clean_text(parts[0])
+                            company = clean_text(parts[1])
                         elif "," in raw_title:
-                            parts = raw_title.rsplit(
-                                ",",
-                                1
-                            )
-                            clean_title = clean_text(
-                                parts[0]
-                            )
-                            company = clean_text(
-                                parts[1]
-                            )
-
+                            parts = raw_title.rsplit(",", 1)
+                            clean_title = clean_text(parts[0])
+                            company = clean_text(parts[1])
                         else:
-                            clean_title = clean_text(
-                                raw_title
-                            )
-
+                            clean_title = clean_text(raw_title)
                     else:
-                        clean_title = clean_text(
-                            raw_title
-                        )
+                        clean_title = clean_text(raw_title)
 
                     href = link_el["href"]
-
                     full_url = (
                         href
                         if href.startswith("http")
@@ -424,32 +344,20 @@ async def process_task(session, task):
                         "url": full_url,
                         "source": "Findwork",
                         "company": company,
-                        "skills": extract_skills(
-                            clean_title
-                        ),
+                        "skills": extract_skills(clean_title),
                     })
 
-            # ----------------------------------------------------
             # FINAL FALLBACK
-            # ----------------------------------------------------
-
             if not jobs:
-                for a_tag in soup.find_all(
-                    "a",
-                    href=FINDWORK_LINK_RE
-                ):
-                    text = a_tag.get_text(
-                        strip=True
-                    )
+                for a_tag in soup.find_all("a", href=FINDWORK_LINK_RE):
+                    text = a_tag.get_text(strip=True)
 
                     if " at " not in text:
                         continue
 
                     parts = text.rsplit(" at ", 1)
-
                     title = clean_text(parts[0])
                     company = clean_text(parts[1])
-
                     href = a_tag["href"]
 
                     full_url = (
@@ -466,25 +374,18 @@ async def process_task(session, task):
                         "skills": extract_skills(title),
                     })
 
-        except (
-            aiohttp.ClientError,
-            asyncio.TimeoutError,
-        ) as e:
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
             print(
                 f"Findwork request error on page {page}: "
                 f"{type(e).__name__}: {e}"
             )
-
         except Exception as e:
             print(
                 f"Error processing Findwork page {page}: "
                 f"{type(e).__name__}: {e}"
             )
 
-    # ============================================================
     # ARBEITNOW
-    # ============================================================
-
     elif source == "ArbeitNow":
         url = (
             "https://www.arbeitnow.com/"
@@ -493,16 +394,9 @@ async def process_task(session, task):
 
         try:
             await asyncio.sleep(random.uniform(0.05, 0.10))
-            async with session.get(
-                url,
-                headers=HEADERS
-            ) as response:
-
+            async with session.get(url, headers=HEADERS) as response:
                 if response.status != 200:
-                    print(
-                        f"ArbeitNow HTTP {response.status} "
-                        f"- page {page}"
-                    )
+                    print(f"ArbeitNow HTTP {response.status} - page {page}")
                     return jobs
 
                 html = await response.text()
@@ -516,27 +410,17 @@ async def process_task(session, task):
 
             for row in job_items:
                 title_el = (
-                    row.select_one(
-                        '[itemprop="title"]'
-                    )
+                    row.select_one('[itemprop="title"]')
                     or row.select_one("h2")
                     or row.select_one("h3")
                 )
 
-                link_el = row.select_one(
-                    'a[href*="/jobs/"]'
-                )
+                link_el = row.select_one('a[href*="/jobs/"]')
 
                 company_el = (
-                    row.select_one(
-                        '[itemprop="hiringOrganization"]'
-                    )
-                    or row.select_one(
-                        'a[href*="/company/"]'
-                    )
-                    or row.select_one(
-                        'a[href*="/companies/"]'
-                    )
+                    row.select_one('[itemprop="hiringOrganization"]')
+                    or row.select_one('a[href*="/company/"]')
+                    or row.select_one('a[href*="/companies/"]')
                     or row.select_one(".company-name")
                     or row.select_one("p.text-gray-500")
                     or row.select_one("span.text-muted")
@@ -545,14 +429,9 @@ async def process_task(session, task):
                 if not (title_el and link_el):
                     continue
 
-                title_text = clean_text(
-                    title_el.get_text()
-                )
-
+                title_text = clean_text(title_el.get_text())
                 company_text = (
-                    clean_text(
-                        company_el.get_text()
-                    )
+                    clean_text(company_el.get_text())
                     if company_el
                     else "N/A"
                 )
@@ -560,30 +439,21 @@ async def process_task(session, task):
                 full_url = link_el["href"]
 
                 if not full_url.startswith("http"):
-                    full_url = (
-                        "https://www.arbeitnow.com"
-                        + full_url
-                    )
+                    full_url = "https://www.arbeitnow.com" + full_url
 
                 jobs.append({
                     "title": title_text,
                     "url": full_url,
                     "source": "ArbeitNow",
                     "company": company_text,
-                    "skills": extract_skills(
-                        title_text
-                    ),
+                    "skills": extract_skills(title_text),
                 })
 
-        except (
-            aiohttp.ClientError,
-            asyncio.TimeoutError,
-        ) as e:
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
             print(
                 f"ArbeitNow request error on page {page}: "
                 f"{type(e).__name__}: {e}"
             )
-
         except Exception as e:
             print(
                 f"Error processing ArbeitNow page {page}: "
@@ -597,45 +467,31 @@ async def process_and_store(session, task):
     jobs = await process_task(session, task)
 
     for job in jobs:
-        r.rpush(
-            "scraped_results",
-            json.dumps(job)
-        )
+        r.rpush("scraped_results", json.dumps(job))
 
     r.incr("scraped_progress")
 
 
 async def worker_loop(worker_id):
-    print(
-        f"Worker {worker_id} started."
-    )
+    print(f"Worker {worker_id} started.")
 
     connector = aiohttp.TCPConnector(
         limit=20,
         limit_per_host=10,
         ttl_dns_cache=300
     )
-
-    timeout = aiohttp.ClientTimeout(
-        total=15
-    )
+    timeout = aiohttp.ClientTimeout(total=15)
 
     async with aiohttp.ClientSession(
         connector=connector,
         timeout=timeout
     ) as session:
-
         while True:
             tasks = []
 
-            # Your benchmark showed batch size 4
-            # is currently the best configuration.
             for _ in range(5):
                 try:
-                    item = r.blpop(
-                        "scrape_queue",
-                        timeout=1
-                    )
+                    item = r.blpop("scrape_queue", timeout=1)
                 except redis.RedisError:
                     item = None
 
@@ -644,31 +500,16 @@ async def worker_loop(worker_id):
 
                 _, task_raw = item
                 task = json.loads(task_raw)
-
-                tasks.append(
-                    process_and_store(
-                        session,
-                        task
-                    )
-                )
+                tasks.append(process_and_store(session, task))
 
             if not tasks:
                 break
 
             await asyncio.gather(*tasks)
 
-    print(
-        f"Worker {worker_id} stopped."
-    )
+    print(f"Worker {worker_id} stopped.")
 
 
 if __name__ == "__main__":
-    worker_name = (
-        sys.argv[1]
-        if len(sys.argv) > 1
-        else "Worker-1"
-    )
-
-    asyncio.run(
-        worker_loop(worker_name)
-    )
+    worker_name = sys.argv[1] if len(sys.argv) > 1 else "Worker-1"
+    asyncio.run(worker_loop(worker_name))
