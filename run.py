@@ -11,7 +11,7 @@ def main():
     worker_input = input('Enter number of parallel workers (default 4): ').strip()
     num_workers = int(worker_input) if worker_input else 4
   except ValueError:
-    print('[!] Invalid input. Defaulting to 4 workers.')
+    print('Invalid input. Using 4 workers.')
     num_workers = 4
 
   base_dir = Path(__file__).resolve().parent
@@ -20,22 +20,21 @@ def main():
   worker_script = base_dir / 'worker.py'
   export_script = base_dir / 'export.py'
 
-
   r = redis.Redis(host='localhost', port=6379, decode_responses=True)
   r.set('scraped_progress', 0)
 
-  print(f'\n[*] Starting pipeline with {num_workers} workers...')
+  print(f'Starting pipeline with {num_workers} workers.')
   start_time = time.time()
 
-  print('[*] Running producer to enqueue tasks...')
+  print('Running producer...')
   prod_result = subprocess.run([str(python_exec), str(producer_script)])
   if prod_result.returncode != 0:
-    print('[!] Producer failed. Aborting.')
+    print('Producer failed.')
     sys.exit(1)
 
   total_tasks = r.llen('scrape_queue')
 
-  print(f'[*] Launching {num_workers} worker processes...')
+  print(f'Launching {num_workers} worker processes...')
   workers = []
   for i in range(1, num_workers + 1):
     worker_name = f'Worker-{i}'
@@ -43,7 +42,7 @@ def main():
     workers.append(p)
 
   with tqdm(
-      total=total_tasks, desc='[*] Scraping Progress', unit='tasks'
+      total=total_tasks, desc='Scraping Progress', unit='tasks'
   ) as pbar:
     last_val = 0
     while any(p.poll() is None for p in workers):
@@ -60,15 +59,15 @@ def main():
   for p in workers:
     p.wait()
 
-  print('\n[*] All workers finished. Exporting results...')
+  print('All workers finished. Exporting results...')
 
   exp_result = subprocess.run([str(python_exec), str(export_script)])
   if exp_result.returncode != 0:
-    print('[!] Export failed.')
+    print('Export failed.')
     sys.exit(1)
 
   elapsed_time = time.time() - start_time
-  print(f'[+] Fetching complete in {elapsed_time:.2f} seconds!')
+  print(f'Fetching completed in {elapsed_time:.2f} seconds.')
 
 
 if __name__ == '__main__':

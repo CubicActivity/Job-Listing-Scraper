@@ -3,8 +3,8 @@ import json
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-def push_tasks(total_pages=30):
-    print("[*] Clearing old queues and result buffers...")
+def push_tasks(total_pages=60):
+    print('Clearing previous queues and results...')
     r.delete('scrape_queue')
     r.delete('scraped_results')
     r.set('scraped_progress', 0)
@@ -17,7 +17,7 @@ def push_tasks(total_pages=30):
         task = {"source": "ArbeitNow", "page": page}
         r.rpush('scrape_queue', json.dumps(task))
 
-    print(f"[✓] Enqueued {r.llen('scrape_queue')} tasks across Findwork and ArbeitNow.")
+    print(f'Enqueued {r.llen("scrape_queue")} tasks.')
 
 if __name__ == "__main__":
     try:
@@ -26,7 +26,7 @@ if __name__ == "__main__":
         ).strip()
         pages_to_scrape = int(user_input) if user_input else 60
     except ValueError:
-        print('[-] Invalid input. Defaulting to 60 pages.')
+        print('Invalid input. Using 60 pages.')
         pages_to_scrape = 60
 
     push_tasks(pages_to_scrape)

@@ -3,10 +3,13 @@ from datetime import datetime
 import json
 from pathlib import Path
 import redis
+
+
 r = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
+
 def export_results():
-  print("[*] Fetching raw records from Redis...")
+  print('Reading results from Redis...')
   records = []
 
   while True:
@@ -18,7 +21,7 @@ def export_results():
     except json.JSONDecodeError:
       continue
 
-  print(f"[*] Fetched {len(records)} raw records from Redis...")
+  print(f'Read {len(records)} records.')
 
   results_dir = Path(__file__).resolve().parent / 'Results'
   results_dir.mkdir(parents=True, exist_ok=True)
@@ -41,10 +44,7 @@ def export_results():
           'url': record.get('url', ''),
       })
 
-  print(
-      f"[+] Success! Exported {len(records)} clean records to '{output_path}'."
-  )
-  print("[+] Cleared 'scraped_results' from Redis.")
+  print(f'Exported {len(records)} records to {output_path}.')
 
 
 if __name__ == '__main__':
